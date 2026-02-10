@@ -93,6 +93,23 @@ public abstract class Product {
         this.stockQuantity = stockQuantity;
     }
 
+    public String getProductType() {
+        if (this instanceof Clothing) return "Clothing";
+        if (this instanceof Shoes) return "Shoes";
+        if (this instanceof Accessory) return "Accessory";
+        return "Unknown";
+    }
+
+    public String getSizeDisplay() {
+        if (this instanceof Clothing) {
+            return String.valueOf(((Clothing) this).getSize());
+        }
+        if (this instanceof Shoes) {
+            return String.valueOf(((Shoes) this).getSize());
+        }
+        return "N/A";
+    }
+
     @Override
     public String toString() {
         return String.format("%s{id=%d, name='%s', purchase=%.2f, sale=%.2f, discount=%.2f, stock=%d}",

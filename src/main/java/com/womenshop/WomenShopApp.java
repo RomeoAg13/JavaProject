@@ -17,6 +17,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
@@ -36,8 +37,10 @@ public class WomenShopApp extends Application {
     private static final String BORDER_COLOR = "#bdc3c7";
 
     private Store store;
-    private ListView<Product> productListView;
+    private TableView<Product> productTableView;
     private ObservableList<Product> productObservableList;
+
+    private boolean isSortedAscending = true;
 
     private Label capitalLabel;
     private Label purchaseCostLabel;
@@ -124,16 +127,100 @@ public class WomenShopApp extends Application {
         Button sortBtn = createButton("Sort by Price", this::sortProducts);
         styleButton(sortBtn, false);
 
-        productListView = new ListView<>(productObservableList);
-        productListView.setPrefHeight(400);
-        productListView.setStyle(
+        productTableView = createProductTable();
+
+        panel.getChildren().addAll(label, filterBox, sortBtn, productTableView);
+        return panel;
+    }
+
+    private TableView<Product> createProductTable() {
+        TableView<Product> tableView = new TableView<>(productObservableList);
+        tableView.setPrefHeight(400);
+        tableView.setStyle(
                 "-fx-background-color: " + LIGHT_BACKGROUND + "; " +
                         "-fx-border-color: " + BORDER_COLOR + "; " +
                         "-fx-border-radius: 5;"
         );
 
-        panel.getChildren().addAll(label, filterBox, sortBtn, productListView);
-        return panel;
+        TableColumn<Product, String> typeCol = new TableColumn<>("Type");
+        typeCol.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getProductType())
+        );
+        typeCol.setPrefWidth(80);
+        typeCol.setSortable(false);
+        typeCol.setReorderable(false);
+
+        TableColumn<Product, String> nameCol = new TableColumn<>("Name");
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setPrefWidth(120);
+        nameCol.setSortable(false);
+        nameCol.setReorderable(false);
+
+        TableColumn<Product, Double> purchaseCol = new TableColumn<>("Purchase");
+        purchaseCol.setCellValueFactory(new PropertyValueFactory<>("purchasePrice"));
+        purchaseCol.setCellFactory(col -> new TableCell<Product, Double>() {
+            @Override
+            protected void updateItem(Double price, boolean empty) {
+                super.updateItem(price, empty);
+                if (empty || price == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%.2f €", price));
+                }
+            }
+        });
+        purchaseCol.setPrefWidth(80);
+        purchaseCol.setSortable(false);
+        purchaseCol.setReorderable(false);
+
+        TableColumn<Product, Double> saleCol = new TableColumn<>("Sale");
+        saleCol.setCellValueFactory(new PropertyValueFactory<>("salePrice"));
+        saleCol.setCellFactory(col -> new TableCell<Product, Double>() {
+            @Override
+            protected void updateItem(Double price, boolean empty) {
+                super.updateItem(price, empty);
+                if (empty || price == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%.2f €", price));
+                }
+            }
+        });
+        saleCol.setPrefWidth(80);
+        saleCol.setSortable(false);
+        saleCol.setReorderable(false);
+
+        TableColumn<Product, Double> discountCol = new TableColumn<>("Discount");
+        discountCol.setCellValueFactory(new PropertyValueFactory<>("discountPrice"));
+        discountCol.setCellFactory(col -> new TableCell<Product, Double>() {
+            @Override
+            protected void updateItem(Double price, boolean empty) {
+                super.updateItem(price, empty);
+                if (empty || price == null) {
+                    setText(null);
+                    setStyle(""); // Reset style
+                } else if (price == 0) {
+                    setText("-");
+                    setStyle(""); // Reset style
+                } else {
+                    setText(String.format("%.2f €", price));
+                    setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+                }
+            }
+        });
+        discountCol.setPrefWidth(80);
+        discountCol.setSortable(false);
+        discountCol.setReorderable(false);
+
+        TableColumn<Product, Integer> stockCol = new TableColumn<>("Stock");
+        stockCol.setCellValueFactory(new PropertyValueFactory<>("stockQuantity"));
+        stockCol.setPrefWidth(60);
+        stockCol.setSortable(false);
+        stockCol.setReorderable(false);
+
+        tableView.getColumns().addAll(typeCol, nameCol, purchaseCol, saleCol, discountCol, stockCol);
+
+        return tableView;
     }
 
     private HBox createFilterButtons() {
@@ -597,8 +684,17 @@ public class WomenShopApp extends Application {
     }
 
     private void sortProducts() {
-        List<Product> sorted = store.sortProductsByPrice(getCurrentProducts());
+        List<Product> sorted;
+
+        if (isSortedAscending) {
+            sorted = store.sortProductsByPrice(getCurrentProducts());
+        } else {
+            sorted = store.sortProductsByPrice(getCurrentProducts());
+            java.util.Collections.reverse(sorted);
+        }
+
         productObservableList.setAll(sorted);
+        isSortedAscending = !isSortedAscending;
     }
 
     private void refreshProductList() {
@@ -612,7 +708,7 @@ public class WomenShopApp extends Application {
     }
 
     private Product getSelectedProduct() {
-        Product selected = productListView.getSelectionModel().getSelectedItem();
+        Product selected = productTableView.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showError("Please select a product");
         }
