@@ -1,0 +1,8 @@
+com/womenshop/model/Store.class
+com/womenshop/model/Shoes.class
+com/womenshop/model/Clothing.class
+com/womenshop/WomenShopApp.class
+com/womenshop/model/Accessory.class
+com/womenshop/model/Product.class
+com/womenshop/util/DatabaseConnection.class
+com/womenshop/dao/ProductDAO.class
