@@ -1,136 +1,101 @@
 package com.womenshop.model;
 
+import com.womenshop.util.ProductValidator;
+
 public abstract class Product {
-    
+
     private int id;
     private String name;
-    private double purchasePrice; 
-    private double salePrice;     
-    private double discountPrice; 
-    private int stockQuantity;    
-    
+    private double purchasePrice;
+    private double salePrice;
+    private double discountPrice;
+    private int stockQuantity;
+
     public Product(String name, double purchasePrice, double salePrice) {
-        this.name = name;
-        this.purchasePrice = purchasePrice;
-        this.salePrice = salePrice;
-        this.discountPrice = 0;   
+        setName(name);
+        setPurchasePrice(purchasePrice);
+        setSalePrice(salePrice);
+        this.discountPrice = 0;
         this.stockQuantity = 0;
     }
 
     public double getEffectivePrice() {
-        if (discountPrice > 0) {
-            return discountPrice;
-        }
-        return salePrice;
+        return discountPrice > 0 ? discountPrice : salePrice;
     }
-    
+
     public void sell(int quantity) {
-        if (quantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
-        }
-        if (quantity > stockQuantity) {
-            throw new IllegalArgumentException("Insufficient stock");
-        }
+        ProductValidator.validateQuantity(quantity, "sell");
+        ProductValidator.validateStock(quantity, stockQuantity);
         stockQuantity -= quantity;
     }
-    
+
     public void purchase(int quantity) {
-        if (quantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
-        }
+        ProductValidator.validateQuantity(quantity, "purchase");
         stockQuantity += quantity;
     }
-    
+
     public void applyDiscount(double percentage) {
-        if (percentage < 0 || percentage > 100) {
-            throw new IllegalArgumentException("Percentage must be between 0 and 100");
-        }
+        ProductValidator.validatePercentage(percentage);
         discountPrice = salePrice * (1 - percentage / 100.0);
     }
-    
+
     public void removeDiscount() {
         discountPrice = 0;
     }
-    
+
     public boolean canBeDeleted() {
         return stockQuantity == 0;
     }
-    
-    public int getId() {
-        return id;
+
+    public boolean hasDiscount() {
+        return discountPrice > 0;
     }
-    
+
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public double getPurchasePrice() { return purchasePrice; }
+    public double getSalePrice() { return salePrice; }
+    public double getDiscountPrice() { return discountPrice; }
+    public int getStockQuantity() { return stockQuantity; }
+
     public void setId(int id) {
         this.id = id;
     }
-    
-    public String getName() {
-        return name;
-    }
-    
+
     public void setName(String name) {
+        ProductValidator.validateName(name);
         this.name = name;
     }
-    
-    public double getPurchasePrice() {
-        return purchasePrice;
-    }
-    
+
     public void setPurchasePrice(double purchasePrice) {
-        if (purchasePrice < 0) {
-            throw new IllegalArgumentException("Purchase price cannot be negative");
-        }
-        if (purchasePrice > salePrice) {
-            throw new IllegalArgumentException("Purchase price cannot be greater than sale price");
+        ProductValidator.validatePrice(purchasePrice, "Purchase price");
+        if (salePrice > 0) {
+            ProductValidator.validatePriceRelationship(purchasePrice, salePrice);
         }
         this.purchasePrice = purchasePrice;
     }
-    
-    public double getSalePrice() {
-        return salePrice;
-    }
-    
+
     public void setSalePrice(double salePrice) {
-        if (salePrice < 0) {
-            throw new IllegalArgumentException("Sale price cannot be negative");
-        }
-        if (salePrice < purchasePrice) {
-            throw new IllegalArgumentException("Sale price cannot be less than purchase price");
+        ProductValidator.validatePrice(salePrice, "Sale price");
+        if (purchasePrice > 0) {
+            ProductValidator.validatePriceRelationship(purchasePrice, salePrice);
         }
         this.salePrice = salePrice;
     }
-    
-    public double getDiscountPrice() {
-        return discountPrice;
-    }
-    
+
     public void setDiscountPrice(double discountPrice) {
-        if (discountPrice < 0) {
-            throw new IllegalArgumentException("Discount price cannot be negative");
-        }
+        ProductValidator.validatePrice(discountPrice, "Discount price");
         this.discountPrice = discountPrice;
     }
-    
-    public int getStockQuantity() {
-        return stockQuantity;
-    }
-    
+
     public void setStockQuantity(int stockQuantity) {
-        if (stockQuantity < 0) {
-            throw new IllegalArgumentException("Stock quantity cannot be negative");
-        }
+        ProductValidator.validateQuantity(stockQuantity, "stock update");
         this.stockQuantity = stockQuantity;
     }
-    
+
     @Override
     public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", purchasePrice=" + purchasePrice +
-                ", salePrice=" + salePrice +
-                ", discountPrice=" + discountPrice +
-                ", stockQuantity=" + stockQuantity +
-                '}';
+        return String.format("%s{id=%d, name='%s', purchase=%.2f, sale=%.2f, discount=%.2f, stock=%d}",
+                getClass().getSimpleName(), id, name, purchasePrice, salePrice, discountPrice, stockQuantity);
     }
 }
