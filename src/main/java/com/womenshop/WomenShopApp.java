@@ -22,14 +22,19 @@ import javafx.stage.Stage;
 
 public class WomenShopApp extends Application {
 
-    // ========== CONSTANTS ==========
     private static final int WINDOW_WIDTH = 1000;
     private static final int WINDOW_HEIGHT = 700;
     private static final int LEFT_PANEL_WIDTH = 500;
     private static final int RIGHT_PANEL_WIDTH = 350;
     private static final int BUTTON_WIDTH = 200;
 
-    // ========== STATE ==========
+    private static final String PRIMARY_COLOR = "#2c3e50";
+    private static final String SECONDARY_COLOR = "#34495e";
+    private static final String ACCENT_COLOR = "#3498db";
+    private static final String BACKGROUND_COLOR = "#ecf0f1";
+    private static final String LIGHT_BACKGROUND = "#ffffff";
+    private static final String BORDER_COLOR = "#bdc3c7";
+
     private Store store;
     private ListView<Product> productListView;
     private ObservableList<Product> productObservableList;
@@ -40,8 +45,6 @@ public class WomenShopApp extends Application {
     private Label profitLabel;
 
     private String currentFilter = "All";
-
-    // ========== MAIN ENTRY POINT ==========
 
     @Override
     public void start(Stage primaryStage) {
@@ -72,7 +75,8 @@ public class WomenShopApp extends Application {
 
     private BorderPane buildMainLayout() {
         BorderPane layout = new BorderPane();
-        layout.setPadding(new Insets(10));
+        layout.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
+        layout.setPadding(new Insets(15));
 
         layout.setTop(createTitleBox());
         layout.setLeft(createProductListPanel());
@@ -88,42 +92,63 @@ public class WomenShopApp extends Application {
         stage.setResizable(false);
     }
 
-    // ========== UI COMPONENTS CREATION ==========
-
     private HBox createTitleBox() {
         Label titleLabel = new Label("WomenShop - Stock Management");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        titleLabel.setStyle(
+                "-fx-font-size: 28px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-text-fill: " + PRIMARY_COLOR + ";"
+        );
 
         HBox titleBox = new HBox(titleLabel);
         titleBox.setAlignment(Pos.CENTER);
-        titleBox.setPadding(new Insets(10));
+        titleBox.setPadding(new Insets(10, 10, 20, 10));
 
         return titleBox;
     }
 
     private VBox createProductListPanel() {
-        VBox panel = new VBox(10);
-        panel.setPadding(new Insets(10));
+        VBox panel = new VBox(12);
+        panel.setPadding(new Insets(15));
         panel.setPrefWidth(LEFT_PANEL_WIDTH);
+        panel.setStyle(
+                "-fx-background-color: " + LIGHT_BACKGROUND + "; " +
+                        "-fx-background-radius: 8; " +
+                        "-fx-border-color: " + BORDER_COLOR + "; " +
+                        "-fx-border-radius: 8; " +
+                        "-fx-border-width: 1;"
+        );
 
         Label label = createSectionLabel("Products");
         HBox filterBox = createFilterButtons();
         Button sortBtn = createButton("Sort by Price", this::sortProducts);
+        styleButton(sortBtn, false);
 
         productListView = new ListView<>(productObservableList);
         productListView.setPrefHeight(400);
+        productListView.setStyle(
+                "-fx-background-color: " + LIGHT_BACKGROUND + "; " +
+                        "-fx-border-color: " + BORDER_COLOR + "; " +
+                        "-fx-border-radius: 5;"
+        );
 
         panel.getChildren().addAll(label, filterBox, sortBtn, productListView);
         return panel;
     }
 
     private HBox createFilterButtons() {
-        HBox filterBox = new HBox(5);
+        HBox filterBox = new HBox(8);
+        filterBox.setAlignment(Pos.CENTER_LEFT);
 
         Button allBtn = createButton("All", () -> filterProducts("All"));
         Button clothingBtn = createButton("Clothing", () -> filterProducts("Clothing"));
         Button shoesBtn = createButton("Shoes", () -> filterProducts("Shoes"));
         Button accessoryBtn = createButton("Accessories", () -> filterProducts("Accessory"));
+
+        styleFilterButton(allBtn);
+        styleFilterButton(clothingBtn);
+        styleFilterButton(shoesBtn);
+        styleFilterButton(accessoryBtn);
 
         filterBox.getChildren().addAll(allBtn, clothingBtn, shoesBtn, accessoryBtn);
         return filterBox;
@@ -131,8 +156,15 @@ public class WomenShopApp extends Application {
 
     private VBox createActionsPanel() {
         VBox panel = new VBox(10);
-        panel.setPadding(new Insets(10));
+        panel.setPadding(new Insets(15));
         panel.setPrefWidth(RIGHT_PANEL_WIDTH);
+        panel.setStyle(
+                "-fx-background-color: " + LIGHT_BACKGROUND + "; " +
+                        "-fx-background-radius: 8; " +
+                        "-fx-border-color: " + BORDER_COLOR + "; " +
+                        "-fx-border-radius: 8; " +
+                        "-fx-border-width: 1;"
+        );
 
         Label label = createSectionLabel("Actions");
 
@@ -144,12 +176,25 @@ public class WomenShopApp extends Application {
         Button applyDiscountBtn = createActionButton("Apply Discounts", this::applyDiscounts);
         Button removeDiscountBtn = createActionButton("Remove Discounts", this::removeDiscounts);
 
+        styleButton(addBtn, true);
+        styleButton(editBtn, false);
+        styleButton(deleteBtn, false);
+        styleButton(purchaseBtn, true);
+        styleButton(sellBtn, true);
+        styleButton(applyDiscountBtn, false);
+        styleButton(removeDiscountBtn, false);
+
+        Separator sep1 = new Separator();
+        Separator sep2 = new Separator();
+        sep1.setStyle("-fx-background-color: " + BORDER_COLOR + ";");
+        sep2.setStyle("-fx-background-color: " + BORDER_COLOR + ";");
+
         panel.getChildren().addAll(
                 label,
                 addBtn, editBtn, deleteBtn,
-                new Separator(),
+                sep1,
                 purchaseBtn, sellBtn,
-                new Separator(),
+                sep2,
                 applyDiscountBtn, removeDiscountBtn
         );
 
@@ -157,27 +202,44 @@ public class WomenShopApp extends Application {
     }
 
     private VBox createStatisticsPanel() {
-        VBox panel = new VBox(5);
-        panel.setPadding(new Insets(10));
-        panel.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #cccccc;");
+        VBox panel = new VBox(8);
+        panel.setPadding(new Insets(15));
+        panel.setStyle(
+                "-fx-background-color: " + LIGHT_BACKGROUND + "; " +
+                        "-fx-background-radius: 8; " +
+                        "-fx-border-color: " + BORDER_COLOR + "; " +
+                        "-fx-border-radius: 8; " +
+                        "-fx-border-width: 1;"
+        );
 
         Label label = createSectionLabel("Statistics");
 
-        capitalLabel = new Label("Current Capital: 30000.00 €");
-        purchaseCostLabel = new Label("Total Purchase Cost: 0.00 €");
-        salesRevenueLabel = new Label("Total Sales Revenue: 0.00 €");
-        profitLabel = new Label("Profit: 0.00 €");
+        capitalLabel = createStatLabel("Current Capital: 30000.00 €");
+        purchaseCostLabel = createStatLabel("Total Purchase Cost: 0.00 €");
+        salesRevenueLabel = createStatLabel("Total Sales Revenue: 0.00 €");
+        profitLabel = createStatLabel("Profit: 0.00 €");
 
         panel.getChildren().addAll(label, capitalLabel, purchaseCostLabel,
                 salesRevenueLabel, profitLabel);
         return panel;
     }
 
-    // ========== UI HELPERS ==========
-
     private Label createSectionLabel(String text) {
         Label label = new Label(text);
-        label.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        label.setStyle(
+                "-fx-font-size: 18px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-text-fill: " + PRIMARY_COLOR + ";"
+        );
+        return label;
+    }
+
+    private Label createStatLabel(String text) {
+        Label label = new Label(text);
+        label.setStyle(
+                "-fx-font-size: 13px; " +
+                        "-fx-text-fill: " + SECONDARY_COLOR + ";"
+        );
         return label;
     }
 
@@ -193,7 +255,72 @@ public class WomenShopApp extends Application {
         return button;
     }
 
-    // ========== DATA LOADING ==========
+    private void styleButton(Button button, boolean isPrimary) {
+        String backgroundColor = isPrimary ? ACCENT_COLOR : SECONDARY_COLOR;
+        String hoverColor = isPrimary ? "#2980b9" : "#2c3e50";
+
+        button.setStyle(
+                "-fx-background-color: " + backgroundColor + "; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-size: 13px; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-padding: 8 15 8 15;"
+        );
+
+        button.setOnMouseEntered(e -> button.setStyle(
+                "-fx-background-color: " + hoverColor + "; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-size: 13px; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-padding: 8 15 8 15;"
+        ));
+
+        button.setOnMouseExited(e -> button.setStyle(
+                "-fx-background-color: " + backgroundColor + "; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-size: 13px; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-padding: 8 15 8 15;"
+        ));
+    }
+
+    private void styleFilterButton(Button button) {
+        button.setStyle(
+                "-fx-background-color: " + BACKGROUND_COLOR + "; " +
+                        "-fx-text-fill: " + SECONDARY_COLOR + "; " +
+                        "-fx-font-size: 12px; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-border-color: " + BORDER_COLOR + "; " +
+                        "-fx-border-radius: 5; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-padding: 6 12 6 12;"
+        );
+
+        button.setOnMouseEntered(e -> button.setStyle(
+                "-fx-background-color: " + ACCENT_COLOR + "; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-size: 12px; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-border-color: " + ACCENT_COLOR + "; " +
+                        "-fx-border-radius: 5; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-padding: 6 12 6 12;"
+        ));
+
+        button.setOnMouseExited(e -> button.setStyle(
+                "-fx-background-color: " + BACKGROUND_COLOR + "; " +
+                        "-fx-text-fill: " + SECONDARY_COLOR + "; " +
+                        "-fx-font-size: 12px; " +
+                        "-fx-background-radius: 5; " +
+                        "-fx-border-color: " + BORDER_COLOR + "; " +
+                        "-fx-border-radius: 5; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-padding: 6 12 6 12;"
+        ));
+    }
 
     private void loadDemoData() {
         try {
@@ -210,8 +337,6 @@ public class WomenShopApp extends Application {
             showError("Error loading demo data: " + e.getMessage());
         }
     }
-
-    // ========== DIALOGS ==========
 
     private void showAddProductDialog() {
         Dialog<Product> dialog = new Dialog<>();
@@ -420,8 +545,6 @@ public class WomenShopApp extends Application {
         );
     }
 
-    // ========== QUANTITY DIALOG HELPER ==========
-
     @FunctionalInterface
     private interface QuantityAction {
         void execute(int quantity) throws Exception;
@@ -446,8 +569,6 @@ public class WomenShopApp extends Application {
         });
     }
 
-    // ========== DISCOUNT OPERATIONS ==========
-
     private void applyDiscounts() {
         try {
             store.applyDiscount("Clothing", 30);
@@ -469,8 +590,6 @@ public class WomenShopApp extends Application {
             showError(e.getMessage());
         }
     }
-
-    // ========== PRODUCT LIST OPERATIONS ==========
 
     private void filterProducts(String category) {
         currentFilter = category;
@@ -500,8 +619,6 @@ public class WomenShopApp extends Application {
         return selected;
     }
 
-    // ========== STATISTICS UPDATE ==========
-
     private void updateStatistics() {
         capitalLabel.setText(formatCurrency("Current Capital", store.getCurrentCapital()));
         purchaseCostLabel.setText(formatCurrency("Total Purchase Cost", store.getTotalPurchaseCost()));
@@ -512,8 +629,6 @@ public class WomenShopApp extends Application {
     private String formatCurrency(String label, double amount) {
         return String.format("%s: %.2f €", label, amount);
     }
-
-    // ========== ALERTS ==========
 
     private void showError(String message) {
         showAlert(Alert.AlertType.ERROR, "Error", message);
@@ -530,8 +645,6 @@ public class WomenShopApp extends Application {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-    // ========== MAIN ==========
 
     public static void main(String[] args) {
         launch(args);
