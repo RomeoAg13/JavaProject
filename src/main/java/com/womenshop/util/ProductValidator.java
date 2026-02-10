@@ -3,7 +3,7 @@ package com.womenshop.util;
 public class ProductValidator {
 
     public static void validateQuantity(int quantity, String operation) {
-        if (quantity <= 0) {
+        if (quantity < 0) {
             throw new IllegalArgumentException(
                     "Quantity for " + operation + " must be positive, got: " + quantity
             );

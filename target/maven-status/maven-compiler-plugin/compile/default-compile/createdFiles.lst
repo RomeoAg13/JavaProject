@@ -1,8 +1,12 @@
+com/womenshop/util/StoreFinance.class
 com/womenshop/model/Store.class
 com/womenshop/model/Shoes.class
 com/womenshop/model/Clothing.class
 com/womenshop/WomenShopApp.class
+com/womenshop/util/ProductFactory.class
 com/womenshop/model/Accessory.class
 com/womenshop/model/Product.class
+com/womenshop/WomenShopApp$QuantityAction.class
+com/womenshop/util/ProductValidator.class
 com/womenshop/util/DatabaseConnection.class
 com/womenshop/dao/ProductDAO.class

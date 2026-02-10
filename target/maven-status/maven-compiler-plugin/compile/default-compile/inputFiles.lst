@@ -4,5 +4,8 @@
 /Users/romeoagostino/Downloads/WomenShop/src/main/java/com/womenshop/dao/ProductDAO.java
 /Users/romeoagostino/Downloads/WomenShop/src/main/java/com/womenshop/model/Clothing.java
 /Users/romeoagostino/Downloads/WomenShop/src/main/java/com/womenshop/WomenShopApp.java
+/Users/romeoagostino/Downloads/WomenShop/src/main/java/com/womenshop/util/StoreFinance.java
 /Users/romeoagostino/Downloads/WomenShop/src/main/java/com/womenshop/model/Shoes.java
 /Users/romeoagostino/Downloads/WomenShop/src/main/java/com/womenshop/util/DatabaseConnection.java
+/Users/romeoagostino/Downloads/WomenShop/src/main/java/com/womenshop/util/ProductValidator.java
+/Users/romeoagostino/Downloads/WomenShop/src/main/java/com/womenshop/util/ProductFactory.java
